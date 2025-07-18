@@ -20,7 +20,7 @@ jobs:
     if: github.event_name == 'pull_request'
     defaults:
       run:
-        working-directory: terraform-infra/envs/dev
+        working-directory: envs/dev
 
     steps:
       - name: Checkout code
