@@ -14,7 +14,10 @@ module "vpc" {
   source = "../../modules/vpc"
   env = "staging" 
 }
-module "iam" { source = "../../modules/iam" }
+module "iam" { 
+  source = "../../modules/iam" 
+  env = "staging"
+}
 module "ecs" {
   source              = "../../modules/ecs"
   env                 = "staging"
