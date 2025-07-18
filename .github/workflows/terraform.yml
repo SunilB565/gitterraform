@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /envs/dev
+        working-directory: envs/dev
 
     steps:
       - name: Checkout code
@@ -63,6 +63,9 @@ jobs:
 
       - name: Terraform Init
         run: terraform init -backend-config=../../backend/main.tf
+        
+      - name: Terraform Plan
+        run: terraform plan
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
@@ -75,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /envs/staging
+        working-directory: envs/staging
 
     steps:
       - name: Checkout code
@@ -103,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /envs/prod
+        working-directory: envs/prod
 
     steps:
       - name: Checkout code
