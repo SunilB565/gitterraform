@@ -1,42 +1,125 @@
-name: Terraform Deploy to ECS Fargate
+name: Terraform Multi-Env Pipeline
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
 
+env:
+  TF_VERSION: 1.6.0
+  AWS_REGION: us-east-1
+
 jobs:
-  terraform:
-    name: Terraform Apply
+  # --- DEV on PR ---
+  dev-pr:
+    name: "Dev - fmt, validate, plan on PR"
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    defaults:
+      run:
+        working-directory: terraform-infra/envs/dev
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1  # ✅ Hardcoded region
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
 
-    - name: Install Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.7.5
+      - name: Terraform Init
+        run: terraform init -backend-config=../../backend/main.tf
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Terraform Fmt
+        run: terraform fmt -check
 
-    - name: Terraform Validate
-      run: terraform validate
+      - name: Terraform Validate
+        run: terraform validate
 
-    - name: Terraform Plan
-      run: terraform plan
+      - name: Terraform Plan
+        run: terraform plan
 
-    - name: Terraform Apply
-      run: terraform apply -auto-approve
-      
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve
+  # --- DEV Apply on Merge ---
+  dev-apply:
+    name: "Dev - Apply"
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform-infra/envs/dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init -backend-config=../../backend/main.tf
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+  # --- STAGING Apply after Dev ---
+  staging-apply:
+    name: "Staging - Apply"
+    needs: dev-apply
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform-infra/envs/staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init -backend-config=../../backend/main.tf
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+  # --- PROD Apply after Staging ---
+  prod-apply:
+    name: "Prod - Apply"
+    needs: staging-apply
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform-infra/envs/prod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init -backend-config=../../backend/main.tf
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
