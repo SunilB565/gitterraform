@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: terraform-infra/envs/dev
+        working-directory: /envs/dev
 
     steps:
       - name: Checkout code
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: terraform-infra/envs/staging
+        working-directory: /envs/staging
 
     steps:
       - name: Checkout code
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: terraform-infra/envs/prod
+        working-directory: /envs/prod
 
     steps:
       - name: Checkout code
