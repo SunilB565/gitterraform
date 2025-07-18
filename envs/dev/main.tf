@@ -10,7 +10,10 @@ terraform {
 
 provider "aws" { region = "us-east-1" }
 
-module "vpc" { source = "../../modules/vpc"; env = "dev" }
+module "vpc" { 
+  source = "../../modules/vpc"
+  env = "dev" 
+}
 module "iam" { source = "../../modules/iam" }
 module "ecs" {
   source              = "../../modules/ecs"
