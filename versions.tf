@@ -10,5 +10,7 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+  # Optionally disable metadata-based credentials
+  skip_metadata_api_check = true
 }
 
