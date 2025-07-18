@@ -19,7 +19,7 @@ resource "aws_ecs_task_definition" "app" {
     {
       name  = "app1"
       image = var.app1_image
-      portMappings = [{ containerPort = 3000 }]
+      portMappings = [{ containerPort = 3001 }]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -32,7 +32,7 @@ resource "aws_ecs_task_definition" "app" {
     {
       name  = "app2"
       image = var.app2_image
-      portMappings = [{ containerPort = 2000 }]
+      portMappings = [{ containerPort = 3000 }]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
