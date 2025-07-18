@@ -16,7 +16,7 @@ module "iam" { source = "../../modules/iam" }
 module "ecs" {
   source              = "../../modules/ecs"
   env                 = "dev"
-  execution_role_arn  = module.iam.ecs_exec.arn
+  execution_role_arn  = module.iam.ecs_exec_role_arn
   vpc_id              = module.vpc.vpc_id
   public_subnet_ids   = module.vpc.public_subnet_ids
   lb_sg_id            = module.vpc.lb_sg_id
