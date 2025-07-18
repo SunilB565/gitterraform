@@ -3,15 +3,12 @@ name: Terraform Deploy to ECS Fargate
 on:
   push:
     branches:
-      - main  # Change to your default branch
+      - main
 
 jobs:
   terraform:
     name: Terraform Apply
     runs-on: ubuntu-latest
-
-    env:
-      AWS_REGION: us-east-1
 
     steps:
     - name: Checkout repo
@@ -22,12 +19,12 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-region: us-east-1  # ✅ Hardcoded region
 
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: 1.7.5  # or latest stable
+        terraform_version: 1.7.5
 
     - name: Terraform Init
       run: terraform init
